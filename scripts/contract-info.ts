@@ -84,11 +84,9 @@ async function main() {
     console.log(`- Remaining: ${(maxSupply - totalMinted).toLocaleString()}`);
 
     // Get metadata info
-    const baseURI = await contract._baseURI();
     const useJsonExtension = await contract.useJsonExtension();
 
     console.log(`\n📄 Metadata Settings:`);
-    console.log(`- Base URI: ${baseURI}`);
     console.log(`- JSON Extension: ${useJsonExtension ? 'Enabled' : 'Disabled'}`);
 
     if (totalMinted > 0) {
@@ -117,7 +115,7 @@ async function main() {
     console.log(`- Fee: ${royaltyPercentage}% (${royaltyFeeBps} basis points)`);
 
     // Get contract balance
-    const balance = await ethers.provider.getBalance(contractAddress);
+    const balance = await ethers.provider.getBalance(deployment.contractAddress);
     console.log(`\n💎 Contract Balance: ${ethers.formatEther(balance)} HYPE`);
 
     // Get pause status
@@ -127,7 +125,7 @@ async function main() {
     // Show recent mints (if any)
     if (totalMinted > 0) {
       console.log(`\n🎨 Recent Token IDs:`);
-      const recentTokens = Math.min(totalMinted, 10);
+      const recentTokens = Math.min(Number(totalMinted), 10);
       for (let i = 1; i <= recentTokens; i++) {
         try {
           const tokenOwner = await contract.ownerOf(i);
@@ -137,24 +135,24 @@ async function main() {
         }
       }
       
-      if (totalMinted > 10) {
-        console.log(`- ... and ${totalMinted - 10} more tokens`);
+      if (Number(totalMinted) > 10) {
+        console.log(`- ... and ${Number(totalMinted) - 10} more tokens`);
       }
     }
 
     // Show contract links
     console.log(`\n🔗 Contract Links:`);
-    console.log(`- Purrsec: https://purrsec.com/address/${contractAddress}/transactions`);
-    console.log(`- Sourcify: https://sourcify.parsec.finance/#/lookup/${contractAddress}`);
+    console.log(`- Purrsec: https://purrsec.com/address/${deployment.contractAddress}/transactions`);
+    console.log(`- Sourcify: https://sourcify.parsec.finance/#/lookup/${deployment.contractAddress}`);
 
     // Show useful commands
     console.log(`\n💡 Useful Commands:`);
-    console.log(`- Enable public mint: npm run enable-public-mint ${contractAddress}`);
-    console.log(`- Disable public mint: npm run disable-public-mint ${contractAddress}`);
-    console.log(`- Mint NFTs: npm run mint-nfts ${contractAddress} owner 5`);
-    console.log(`- Update base URI: npm run update-metadata ${contractAddress} baseuri https://new-api.com/metadata/`);
-    console.log(`- Toggle JSON extension: npm run update-metadata ${contractAddress} extension false`);
-    console.log(`- Withdraw funds: npm run withdraw ${contractAddress}`);
+    console.log(`- Enable public mint: npm run enable-public-mint ${deployment.contractAddress}`);
+    console.log(`- Disable public mint: npm run disable-public-mint ${deployment.contractAddress}`);
+    console.log(`- Mint NFTs: npm run mint-nfts ${deployment.contractAddress} owner 5`);
+    console.log(`- Update base URI: npm run update-metadata ${deployment.contractAddress} baseuri https://new-api.com/metadata/`);
+    console.log(`- Toggle JSON extension: npm run update-metadata ${deployment.contractAddress} extension false`);
+    console.log(`- Withdraw funds: npm run withdraw ${deployment.contractAddress}`);
 
   } catch (error: any) {
     console.error("❌ Failed to get contract info:", error.message);

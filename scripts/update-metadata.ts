@@ -95,9 +95,7 @@ async function main() {
 
     if (action === 'baseuri') {
       // Update base URI
-      const currentBaseURI = await contract._baseURI();
-      console.log(`\n📊 Current Base URI: ${currentBaseURI}`);
-      console.log(`🔄 New Base URI: ${value}`);
+      console.log(`\n📊 Current Base URI: Will be updated to ${value}`);
 
       console.log(`\n⏳ Updating base URI...`);
       const tx = await contract.setBaseURI(value);
@@ -110,10 +108,6 @@ async function main() {
       console.log(`\n✅ Base URI updated successfully!`);
       console.log(`🔗 Transaction: ${tx.hash}`);
       console.log(`⛽ Gas used: ${receipt.gasUsed?.toString()}`);
-
-      // Verify the change
-      const newBaseURI = await contract._baseURI();
-      console.log(`\n📊 Updated Base URI: ${newBaseURI}`);
 
       // Show example token URI
       const totalMinted = await contract.totalMinted();
@@ -157,11 +151,9 @@ async function main() {
       // Show example token URI
       const totalMinted = await contract.totalMinted();
       if (totalMinted > 0) {
-        const baseURI = await contract._baseURI();
         const exampleTokenId = 1;
         const exampleURI = await contract.tokenURI(exampleTokenId);
         console.log(`\n🔗 Example Token URI (ID ${exampleTokenId}): ${exampleURI}`);
-        console.log(`📄 Base URI: ${baseURI}`);
       }
 
     } else {
