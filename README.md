@@ -73,6 +73,10 @@ npm run deploy
 
 **🔍 View your collection:** After deployment, you can view your collection and transactions at https://purrsec.com
 
+**🚀 Launch your NFT:** Consider launching your NFT collection with [Drip Trade's HyperLaunch](https://drip-trade.gitbook.io/drip.trade/launchpad/quickstart) - Drip's exclusive NFT launchpad built to accelerate the NFT ecosystem on Hyperliquid
+
+**🛒 Secondary marketplace:** Trade NFTs on the secondary market at [Drip.Trade](https://drip.trade/) - the leading NFT marketplace for Hyperliquid
+
 **📝 Deployment Record:** A detailed deployment record is automatically saved in the `deployment_history/` folder
 
 ---
