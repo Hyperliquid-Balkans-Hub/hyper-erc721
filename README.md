@@ -117,6 +117,12 @@ You can customize your NFT collection by setting these environment variables in 
 | `npm run verify`       | Verify contracts with Sourcify  |
 | `npm run clean`        | Clean compiled artifacts        |
 | `npm run node`         | Start local Hardhat node        |
+| `npm run contract-info`| Get comprehensive contract info |
+| `npm run enable-public-mint` | Enable public minting |
+| `npm run disable-public-mint` | Disable public minting |
+| `npm run mint-nfts`    | Mint NFTs (owner or public)     |
+| `npm run update-metadata` | Update base URI or JSON extension |
+| `npm run withdraw`     | Withdraw contract funds          |
 
 ## 🔍 Contract Features
 
@@ -192,6 +198,54 @@ This is perfect for decentralized storage systems like:
 - **Traditional APIs**: Both formats are commonly used
 
 The setting can be configured during deployment and changed later by the contract owner using the `setJsonExtension()` function.
+
+## 🛠️ Contract Management Scripts
+
+After deploying your NFT collection, you can use these convenient scripts to manage your contract:
+
+### **📊 Contract Information**
+```bash
+npm run contract-info                    # Info for latest deployment
+npm run contract-info 0xContractAddress  # Info for specific contract
+```
+Shows comprehensive contract details including minting stats, settings, and useful links.
+
+### **🎯 Public Minting Management**
+```bash
+npm run enable-public-mint                    # Enable for latest deployment
+npm run enable-public-mint 0xContractAddress  # Enable for specific contract
+npm run disable-public-mint                   # Disable for latest deployment
+npm run disable-public-mint 0xContractAddress # Disable for specific contract
+```
+Control public minting with environment variables:
+- `PUBLIC_MINT_PRICE=0.01` - Price in HYPE
+- `MAX_MINTS_PER_ADDRESS=10` - Max mints per address
+
+### **🎨 NFT Minting**
+```bash
+npm run mint-nfts                                    # Owner mint 1 NFT to signer
+npm run mint-nfts 0xContractAddress                  # Owner mint 1 NFT to signer
+npm run mint-nfts 0xContractAddress owner 5          # Owner mint 5 NFTs to signer
+npm run mint-nfts 0xContractAddress owner 5 0xAddr   # Owner mint 5 NFTs to address
+npm run mint-nfts 0xContractAddress public 3         # Public mint 3 NFTs
+```
+
+### **📄 Metadata Updates**
+```bash
+npm run update-metadata baseuri https://new-api.com/metadata/
+npm run update-metadata extension false
+npm run update-metadata 0xContractAddress baseuri https://new-api.com/metadata/
+npm run update-metadata 0xContractAddress extension true
+```
+
+### **💰 Fund Management**
+```bash
+npm run withdraw                    # Withdraw from latest deployment
+npm run withdraw 0xContractAddress  # Withdraw from specific contract
+```
+
+### **🔧 Smart Defaults**
+All scripts automatically use your **latest deployed contract** if no address is specified, making management seamless for single-collection projects.
 
 ## 🌐 Network Configuration
 

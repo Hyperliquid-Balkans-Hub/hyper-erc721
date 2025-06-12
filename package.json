@@ -11,7 +11,13 @@
     "verify:sourcify": "ts-node scripts/verify-sourcify.ts",
     "test": "hardhat test",
     "node": "hardhat node",
-    "clean": "hardhat clean"
+    "clean": "hardhat clean",
+    "enable-public-mint": "ts-node scripts/enable-public-mint.ts",
+    "disable-public-mint": "ts-node scripts/disable-public-mint.ts",
+    "mint-nfts": "ts-node scripts/mint-nfts.ts",
+    "update-metadata": "ts-node scripts/update-metadata.ts",
+    "contract-info": "ts-node scripts/contract-info.ts",
+    "withdraw": "ts-node scripts/withdraw.ts"
   },
   "keywords": [
     "hypererc721",
