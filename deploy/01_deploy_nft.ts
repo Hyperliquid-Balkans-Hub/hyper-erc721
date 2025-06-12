@@ -13,6 +13,7 @@ const deployNFT: DeployFunction = async function (hre: HardhatRuntimeEnvironment
   const collectionSymbol = process.env.COLLECTION_SYMBOL || 'MNC';
   const maxSupply = process.env.MAX_SUPPLY || '10000';
   const baseURI = process.env.BASE_URI || 'https://api.example.com/metadata/';
+  const useJsonExtension = process.env.USE_JSON_EXTENSION === 'true';
   const royaltyRecipient = process.env.ROYALTY_RECIPIENT || deployer;
   const royaltyFeeBps = process.env.ROYALTY_FEE_BPS || '500';
   
@@ -30,6 +31,7 @@ const deployNFT: DeployFunction = async function (hre: HardhatRuntimeEnvironment
   console.log(`- Collection Symbol: ${collectionSymbol}`);
   console.log(`- Max Supply: ${maxSupply}`);
   console.log(`- Base URI: ${baseURI}`);
+  console.log(`- Metadata Format: ${useJsonExtension ? 'With .json extension' : 'Without extension'}`);
   console.log(`- Royalty Recipient: ${royaltyRecipient}`);
   console.log(`- Royalty Fee: ${Number(royaltyFeeBps) / 100}%`);
   console.log(`- Initial Mint Quantity: ${mintQuantity}`);
@@ -43,7 +45,7 @@ const deployNFT: DeployFunction = async function (hre: HardhatRuntimeEnvironment
 
   const nftContract = await deploy('HyperERC721', {
     from: deployer,
-    args: [collectionName, collectionSymbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps],
+    args: [collectionName, collectionSymbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps, useJsonExtension],
     log: true,
     waitConfirmations: 1,
   });
@@ -119,6 +121,7 @@ const deployNFT: DeployFunction = async function (hre: HardhatRuntimeEnvironment
 - **Collection Symbol:** ${collectionSymbol}
 - **Max Supply:** ${Number(maxSupply).toLocaleString()} NFTs
 - **Base URI:** ${baseURI}
+- **Metadata Format:** ${useJsonExtension ? 'With .json extension (e.g., /1.json)' : 'Without extension (e.g., /1)'}
 - **Initial Mint:** ${mintQuantity} NFTs
 
 ## Deployment Details
@@ -190,7 +193,7 @@ ${publicMintEnabled ? `- **Mint Price:** ${publicMintPrice} HYPE per NFT
       console.log('🔍 Attempting contract verification...');
       await hre.run('verify:verify', {
         address: nftContract.address,
-        constructorArguments: [collectionName, collectionSymbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps], // HyperERC721 constructor arguments
+        constructorArguments: [collectionName, collectionSymbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps, useJsonExtension], // HyperERC721 constructor arguments
       });
       console.log('✅ Contract verified successfully!');
       console.log(`🔍 View verified contract: https://sourcify.parsec.finance/#/lookup/${nftContract.address}`);

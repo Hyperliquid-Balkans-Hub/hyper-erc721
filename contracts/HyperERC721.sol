@@ -23,6 +23,9 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
     bool public publicMintEnabled;
     string private _baseTokenURI;
     
+    // Metadata configuration
+    bool public useJsonExtension; // Whether to append .json to tokenURI
+    
     // Royalty info
     address public royaltyRecipient;
     uint96 public royaltyFeeBps; // Basis points (e.g., 500 = 5%)
@@ -38,6 +41,7 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
      * @param baseURI The base URI for token metadata
      * @param royaltyRecipient_ Address to receive royalties
      * @param royaltyFeeBps_ Royalty fee in basis points (e.g., 500 = 5%)
+     * @param useJsonExtension_ Whether to append .json extension to tokenURI
      */
     constructor(
         string memory name,
@@ -45,12 +49,14 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
         uint256 maxSupply_,
         string memory baseURI,
         address royaltyRecipient_,
-        uint96 royaltyFeeBps_
+        uint96 royaltyFeeBps_,
+        bool useJsonExtension_
     ) ERC721(name, symbol) Ownable(msg.sender) {
         maxSupply = maxSupply_;
         _baseTokenURI = baseURI;
         royaltyRecipient = royaltyRecipient_;
         royaltyFeeBps = royaltyFeeBps_;
+        useJsonExtension = useJsonExtension_;
         _nextTokenId = 1; // Start token IDs at 1
         
         // Default settings
@@ -100,6 +106,14 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
      */
     function setBaseURI(string memory baseURI) external onlyOwner {
         _baseTokenURI = baseURI;
+    }
+    
+    /**
+     * @dev Set whether to use .json extension for metadata URLs
+     * @param useExtension Whether to append .json to tokenURI
+     */
+    function setJsonExtension(bool useExtension) external onlyOwner {
+        useJsonExtension = useExtension;
     }
     
     /**
@@ -204,7 +218,27 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
         override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
-        return super.tokenURI(tokenId);
+        _requireOwned(tokenId);
+
+        string memory baseURI = _baseURI();
+        if (bytes(baseURI).length == 0) {
+            return "";
+        }
+        
+        // Check if individual token URI is set (ERC721URIStorage)
+        string memory _tokenURI = _tokenURIs[tokenId];
+        if (bytes(_tokenURI).length > 0) {
+            return _tokenURI;
+        }
+
+        // Build URI from base + tokenId + optional .json extension
+        string memory tokenIdStr = tokenId.toString();
+        
+        if (useJsonExtension) {
+            return string(abi.encodePacked(baseURI, tokenIdStr, ".json"));
+        } else {
+            return string(abi.encodePacked(baseURI, tokenIdStr));
+        }
     }
 
     function supportsInterface(bytes4 interfaceId)

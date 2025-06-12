@@ -32,6 +32,11 @@ COLLECTION_SYMBOL=YNC
 MAX_SUPPLY=10000
 BASE_URI=https://api.yourproject.com/metadata/
 
+# Metadata configuration  
+# Set to true if your metadata URLs should end with .json (e.g., /1.json)
+# Set to false if your metadata URLs are without extension (e.g., /1)
+USE_JSON_EXTENSION=true
+
 # Royalty configuration
 ROYALTY_RECIPIENT=0x0000000000000000000000000000000000000000
 ROYALTY_FEE_BPS=500
@@ -93,6 +98,7 @@ You can customize your NFT collection by setting these environment variables in 
 | `COLLECTION_SYMBOL`| Collection symbol/ticker            | "MNC"     | "AWE"          |
 | `MAX_SUPPLY`     | Maximum number of NFTs in collection  | "10000"   | "5555"         |
 | `BASE_URI`       | Base URI for metadata                 | "https://api.example.com/metadata/" | "https://api.myproject.com/metadata/" |
+| `USE_JSON_EXTENSION`| Append .json to metadata URLs       | "true"    | "false"        |
 | `ROYALTY_RECIPIENT`| Address to receive royalties        | deployer  | "0x123..."     |
 | `ROYALTY_FEE_BPS`| Royalty fee in basis points (1-1000) | "500"     | "750"          |
 | `MINT_QUANTITY`  | Initial NFTs to mint to deployer      | "10"      | "100"          |
@@ -162,10 +168,30 @@ This gives you full control over NFT distribution and allows for:
 - `mint(to, quantity)` - Mint NFTs (owner only)
 - `publicMint(quantity)` - Public mint function (when enabled)
 - `setBaseURI(baseURI)` - Update metadata base URI
+- `setJsonExtension(useExtension)` - Set metadata URL format (with/without .json)
 - `setPublicMintSettings(enabled, price, maxPerAddress)` - Configure public mint
 - `setRoyaltyInfo(recipient, feeBps)` - Update royalty settings
 - `withdraw()` - Withdraw contract earnings
 - `pause()` / `unpause()` - Emergency controls
+
+### Metadata URL Flexibility
+
+The contract supports both metadata URL formats:
+
+**With .json extension** (`USE_JSON_EXTENSION=true`):
+- Token 1: `https://api.example.com/metadata/1.json`
+- Token 2: `https://api.example.com/metadata/2.json`
+
+**Without extension** (`USE_JSON_EXTENSION=false`):
+- Token 1: `https://api.example.com/metadata/1`
+- Token 2: `https://api.example.com/metadata/2`
+
+This is perfect for decentralized storage systems like:
+- **Swarm/bzz.link**: `https://bzz.link/bzz/hash/1` or `https://bzz.link/bzz/hash/1.json`
+- **IPFS**: `https://ipfs.io/ipfs/hash/1` or `https://ipfs.io/ipfs/hash/1.json`
+- **Traditional APIs**: Both formats are commonly used
+
+The setting can be configured during deployment and changed later by the contract owner using the `setJsonExtension()` function.
 
 ## 🌐 Network Configuration
 

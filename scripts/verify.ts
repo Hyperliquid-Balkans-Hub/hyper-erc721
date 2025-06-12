@@ -8,6 +8,7 @@ interface DeploymentInfo {
   collectionSymbol: string;
   maxSupply: string;
   baseURI: string;
+  useJsonExtension: boolean;
   royaltyRecipient: string;
   royaltyFeeBps: string;
   contractName: string;
@@ -42,6 +43,7 @@ function getLatestDeployment(): DeploymentInfo {
   const collectionSymbolMatch = content.match(/\*\*Collection Symbol:\*\* ([^\n]+)/);
   const maxSupplyMatch = content.match(/\*\*Max Supply:\*\* ([0-9,]+) NFTs/);
   const baseURIMatch = content.match(/\*\*Base URI:\*\* ([^\n]+)/);
+  const metadataFormatMatch = content.match(/\*\*Metadata Format:\*\* (With \.json extension|Without extension)/);
   const royaltyRecipientMatch = content.match(/\*\*Royalty Recipient:\*\* `([^`]+)`/);
   const royaltyFeeBpsMatch = content.match(/\*\*Royalty Fee:\*\* [0-9.]+% \(([0-9]+) basis points\)/);
 
@@ -50,12 +52,16 @@ function getLatestDeployment(): DeploymentInfo {
     throw new Error(`Could not parse deployment information from ${latestFile}`);
   }
 
+  // Parse metadata format, default to true for backward compatibility
+  const useJsonExtension = metadataFormatMatch ? metadataFormatMatch[1].includes('With .json') : true;
+
   return {
     contractAddress: contractAddressMatch[1],
     collectionName: collectionNameMatch[1],
     collectionSymbol: collectionSymbolMatch[1],
     maxSupply: maxSupplyMatch[1].replace(/,/g, ''), // Remove commas from number
     baseURI: baseURIMatch[1],
+    useJsonExtension: useJsonExtension,
     royaltyRecipient: royaltyRecipientMatch[1],
     royaltyFeeBps: royaltyFeeBpsMatch[1],
     contractName: 'HyperERC721' // We know this is always HyperERC721
@@ -67,14 +73,15 @@ async function main() {
     // Get deployment info from latest deployment history
     const deployment = getLatestDeployment();
     
-    // Constructor arguments from deployment (HyperERC721 takes: name, symbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps)
+    // Constructor arguments from deployment (HyperERC721 takes: name, symbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps, useJsonExtension)
     const constructorArgs = [
       deployment.collectionName,
       deployment.collectionSymbol,
       deployment.maxSupply,
       deployment.baseURI,
       deployment.royaltyRecipient,
-      deployment.royaltyFeeBps
+      deployment.royaltyFeeBps,
+      deployment.useJsonExtension
     ];
 
     console.log("🔍 Verifying contract on Hyperliquid HyperEVM...");
@@ -83,6 +90,7 @@ async function main() {
     console.log(`🏷️  Collection: ${deployment.collectionName} (${deployment.collectionSymbol})`);
     console.log(`🔢 Max Supply: ${Number(deployment.maxSupply).toLocaleString()}`);
     console.log(`🔗 Base URI: ${deployment.baseURI}`);
+    console.log(`📄 Metadata Format: ${deployment.useJsonExtension ? 'With .json extension' : 'Without extension'}`);
     console.log(`💰 Royalty: ${Number(deployment.royaltyFeeBps) / 100}% to ${deployment.royaltyRecipient}`);
     console.log(`🔧 Constructor Args:`, constructorArgs);
 
