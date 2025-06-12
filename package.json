@@ -1,0 +1,41 @@
+{
+  "name": "hypererc721-nft-deployer",
+  "version": "1.0.0",
+  "description": "HyperERC721 NFT deployer for Hyperliquid HyperEVM",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat deploy --network hyperliquid --tags nft",
+    "deploy:local": "hardhat deploy --network localhost",
+    "verify": "hardhat verify --network hyperliquid",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "hypererc721",
+    "erc721",
+    "nft",
+    "hyperliquid",
+    "hyperevm",
+    "hardhat"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "hardhat": "^2.19.0",
+    "hardhat-deploy": "^0.12.0",
+    "hardhat-deploy-ethers": "^0.4.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0"
+  }
+}
