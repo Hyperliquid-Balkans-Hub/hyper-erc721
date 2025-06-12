@@ -12,21 +12,24 @@ describe('HyperERC721', function () {
   const COLLECTION_SYMBOL = 'TNC';
   const MAX_SUPPLY = 1000;
   const BASE_URI = 'https://api.test.com/metadata/';
+  const USE_JSON_EXTENSION = true;
   const ROYALTY_FEE_BPS = 500; // 5%
 
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
 
     const NFTFactory = await ethers.getContractFactory('HyperERC721');
-    nftContract = await NFTFactory.deploy(
+    const deployedContract = await NFTFactory.deploy(
       COLLECTION_NAME, 
       COLLECTION_SYMBOL, 
       MAX_SUPPLY, 
       BASE_URI, 
       owner.address, 
-      ROYALTY_FEE_BPS
+      ROYALTY_FEE_BPS,
+      USE_JSON_EXTENSION
     );
-    await nftContract.waitForDeployment();
+    await deployedContract.waitForDeployment();
+    nftContract = deployedContract as unknown as HyperERC721;
   });
 
   describe('Deployment', function () {
@@ -128,9 +131,9 @@ describe('HyperERC721', function () {
   });
 
   describe('Metadata', function () {
-    it('Should return correct base URI', async function () {
+    it('Should return correct base URI with JSON extension', async function () {
       await nftContract.mint(addr1.address, 1);
-      expect(await nftContract.tokenURI(1)).to.equal(BASE_URI + '1');
+      expect(await nftContract.tokenURI(1)).to.equal(BASE_URI + '1.json');
     });
 
     it('Should allow owner to update base URI', async function () {
@@ -138,12 +141,31 @@ describe('HyperERC721', function () {
       await nftContract.setBaseURI(newBaseURI);
       
       await nftContract.mint(addr1.address, 1);
-      expect(await nftContract.tokenURI(1)).to.equal(newBaseURI + '1');
+      expect(await nftContract.tokenURI(1)).to.equal(newBaseURI + '1.json');
+    });
+
+    it('Should allow owner to toggle JSON extension', async function () {
+      await nftContract.mint(addr1.address, 1);
+      expect(await nftContract.tokenURI(1)).to.equal(BASE_URI + '1.json');
+      
+      // Disable JSON extension
+      await nftContract.setJsonExtension(false);
+      expect(await nftContract.tokenURI(1)).to.equal(BASE_URI + '1');
+      
+      // Re-enable JSON extension
+      await nftContract.setJsonExtension(true);
+      expect(await nftContract.tokenURI(1)).to.equal(BASE_URI + '1.json');
     });
 
     it('Should not allow non-owner to update base URI', async function () {
       await expect(
         nftContract.connect(addr1).setBaseURI('https://hack.com/')
+      ).to.be.revertedWithCustomError(nftContract, 'OwnableUnauthorizedAccount');
+    });
+
+    it('Should not allow non-owner to toggle JSON extension', async function () {
+      await expect(
+        nftContract.connect(addr1).setJsonExtension(false)
       ).to.be.revertedWithCustomError(nftContract, 'OwnableUnauthorizedAccount');
     });
   });

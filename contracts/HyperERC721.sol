@@ -220,24 +220,30 @@ contract HyperERC721 is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausab
     {
         _requireOwned(tokenId);
 
+        // First check if individual token URI is set (ERC721URIStorage)
+        // We'll try to get the parent's tokenURI and see if it's just base + tokenId
+        string memory parentURI = ERC721URIStorage.tokenURI(tokenId);
         string memory baseURI = _baseURI();
+        
+        // If there's no baseURI, return the parent's result (could be individual URI or empty)
         if (bytes(baseURI).length == 0) {
-            return "";
+            return parentURI;
         }
         
-        // Check if individual token URI is set (ERC721URIStorage)
-        string memory _tokenURI = _tokenURIs[tokenId];
-        if (bytes(_tokenURI).length > 0) {
-            return _tokenURI;
+        // Check if the parent returned an individual URI (not base + tokenId pattern)
+        string memory defaultTokenIdStr = tokenId.toString();
+        string memory expectedBaseURI = string(abi.encodePacked(baseURI, defaultTokenIdStr));
+        
+        // If parent URI doesn't match the expected base + tokenId pattern, it's an individual URI
+        if (keccak256(abi.encodePacked(parentURI)) != keccak256(abi.encodePacked(expectedBaseURI))) {
+            return parentURI; // Return the individual URI
         }
 
         // Build URI from base + tokenId + optional .json extension
-        string memory tokenIdStr = tokenId.toString();
-        
         if (useJsonExtension) {
-            return string(abi.encodePacked(baseURI, tokenIdStr, ".json"));
+            return string(abi.encodePacked(baseURI, defaultTokenIdStr, ".json"));
         } else {
-            return string(abi.encodePacked(baseURI, tokenIdStr));
+            return string(abi.encodePacked(baseURI, defaultTokenIdStr));
         }
     }
 
