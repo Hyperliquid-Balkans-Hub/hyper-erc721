@@ -38,10 +38,26 @@ const config: HardhatUserConfig = {
       default: 0,
     },
   },
-  // etherscan: {
-  //   // Contract verification not available on Hyperliquid
-  //   // Use https://purrsec.com to view transactions and contracts
-  // },
+  etherscan: {
+    apiKey: {
+      hyperliquid: "no-api-key-needed", // Sourcify doesn't require API key
+    },
+    customChains: [
+      {
+        network: "hyperliquid",
+        chainId: 999,
+        urls: {
+          apiURL: "https://sourcify.parsec.finance/verify",
+          browserURL: "https://purrsec.com"
+        }
+      }
+    ]
+  },
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.parsec.finance/verify",
+    browserUrl: "https://sourcify.parsec.finance",
+  },
   paths: {
     sources: "./contracts",
     tests: "./test",

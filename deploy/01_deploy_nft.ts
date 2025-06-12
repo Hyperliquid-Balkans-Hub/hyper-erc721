@@ -181,6 +181,25 @@ ${publicMintEnabled ? `- **Mint Price:** ${publicMintPrice} HYPE per NFT
   
   console.log(`📝 Deployment record saved: deployment_history/${filename}`);
 
+  // Verify contract if not on localhost
+  if (hre.network.name !== 'localhost' && hre.network.name !== 'hardhat') {
+    console.log('\n⏳ Waiting for block confirmations...');
+    await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
+
+    try {
+      console.log('🔍 Attempting contract verification...');
+      await hre.run('verify:verify', {
+        address: nftContract.address,
+        constructorArguments: [collectionName, collectionSymbol, maxSupply, baseURI, royaltyRecipient, royaltyFeeBps], // HyperERC721 constructor arguments
+      });
+      console.log('✅ Contract verified successfully!');
+      console.log(`🔍 View verified contract: https://sourcify.parsec.finance/#/lookup/${nftContract.address}`);
+    } catch (error: any) {
+      console.log('❌ Contract verification failed:', error.message || error);
+      console.log('💡 You can verify manually later using: npm run verify');
+    }
+  }
+
   console.log(`\n🎉 NFT Collection deployment completed!`);
   console.log(`🖼️  Collection: ${collectionName} (${collectionSymbol})`);
   console.log(`🔢 Total Minted: ${mintQuantity}/${maxSupply}`);

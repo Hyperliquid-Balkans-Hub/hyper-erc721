@@ -108,7 +108,7 @@ You can customize your NFT collection by setting these environment variables in 
 | `npm run deploy`       | Deploy to Hyperliquid mainnet   |
 | `npm run deploy:local` | Deploy to local hardhat network |
 | `npm run test`         | Run contract tests              |
-| `npm run verify`       | ~~Verify contracts~~ (Not available) |
+| `npm run verify`       | Verify contracts with Sourcify  |
 | `npm run clean`        | Clean compiled artifacts        |
 | `npm run node`         | Start local Hardhat node        |
 
@@ -360,9 +360,92 @@ This is the most common error when deploying NFT contracts on Hyperliquid.
 
 ## 📄 Contract Verification
 
-**Contract verification is not currently available on Hyperliquid HyperEVM.**
+Contract verification **is now available** on Hyperliquid HyperEVM using Sourcify through Parsec's verifier! This allows you to verify your deployed contracts and make the source code publicly available.
 
-You can view your deployed contracts and transactions at https://purrsec.com by searching for your contract address.
+### Verify with Hardhat (Recommended)
+
+This project uses Hardhat, so verification with Hardhat is the most straightforward approach.
+
+**Step 1: Install the verification plugin**
+```bash
+npm install --save-dev @nomicfoundation/hardhat-verify
+```
+
+**Step 2: Add the plugin to your hardhat.config.ts**
+```typescript
+import "@nomicfoundation/hardhat-verify";
+```
+
+**Step 3: Update hardhat.config.ts with Sourcify configuration**
+```typescript
+module.exports = {
+  // ... existing config
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.parsec.finance",
+    browserUrl: "https://sourcify.parsec.finance",
+  },
+  etherscan: {
+    apiKey: {
+      // This can be any string for Sourcify
+      hyperliquid: "no-api-key-needed"
+    },
+    customChains: [
+      {
+        network: "hyperliquid",
+        chainId: 999,
+        urls: {
+          apiURL: "https://sourcify.parsec.finance/verify",
+          browserURL: "https://sourcify.parsec.finance"
+        }
+      }
+    ]
+  }
+};
+```
+
+**Step 4: Verify your contract**
+```bash
+npx hardhat verify --network hyperliquid YOUR_CONTRACT_ADDRESS "ConstructorArg1" "ConstructorArg2"
+```
+
+For HyperERC721, use the constructor arguments from your deployment:
+```bash
+npx hardhat verify --network hyperliquid 0xYourContractAddress "YourCollectionName" "YourSymbol" 10000 "https://api.yourproject.com/metadata/" 0xYourAddress 500
+```
+
+### Verify with Foundry (Alternative)
+
+If you prefer using Foundry for verification:
+
+```bash
+forge verify-contract YOUR_CONTRACT_ADDRESS contracts/HyperERC721.sol:HyperERC721 \
+  --chain-id 999 \
+  --verifier sourcify \
+  --verifier-url https://sourcify.parsec.finance/verify \
+  --constructor-args $(cast abi-encode "constructor(string,string,uint256,string,address,uint96)" "YourCollectionName" "YourSymbol" 10000 "https://api.yourproject.com/metadata/" "0xYourAddress" 500)
+```
+
+### Troubleshooting Verification
+
+If you encounter errors during verification, try:
+
+1. **Ensure correct chain ID**: Always use `--chain-id 999` for Hyperliquid
+2. **Set compiler version explicitly**: Add `--compiler-version 0.8.20` (or your version)
+3. **Run from project root**: Execute the command from your project's root directory
+4. **Remove explorer settings**: Remove any `ETHERSCAN_API_URL` and `ETHERSCAN_API_KEY` from `.env` and `foundry.toml`
+5. **Check constructor arguments**: Ensure they match exactly what was used during deployment
+6. **Wait for contract creation**: Make sure your contract deployment transaction is confirmed before verifying
+
+### After Verification
+
+Once verified, you can:
+- ✅ View your contract source code publicly
+- ✅ Interact with your contract through block explorers
+- ✅ Build trust with your community by showing transparent code
+- ✅ Enable other developers to fork and learn from your implementation
+
+**View your contracts:** You can still view your deployed contracts and transactions at https://purrsec.com by searching for your contract address.
 
 ## 🎯 Example Deployment Output
 

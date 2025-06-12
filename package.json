@@ -7,7 +7,8 @@
     "compile": "hardhat compile",
     "deploy": "hardhat deploy --network hyperliquid --tags nft",
     "deploy:local": "hardhat deploy --network localhost",
-    "verify": "hardhat verify --network hyperliquid",
+    "verify": "ts-node scripts/verify.ts",
+    "verify:sourcify": "ts-node scripts/verify-sourcify.ts",
     "test": "hardhat test",
     "node": "hardhat node",
     "clean": "hardhat clean"
@@ -35,7 +36,9 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0",
+    "axios": "^1.6.0",
     "dotenv": "^16.3.1",
-    "ethers": "^6.8.0"
+    "ethers": "^6.8.0",
+    "form-data": "^4.0.0"
   }
 }
